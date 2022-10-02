@@ -40,10 +40,36 @@ window.addEventListener("DOMContentLoaded", function () {
       this.height = 200;
       this.x = 0;
       this.y = this.gameHeight - this.height;
+      this.image = document.getElementById("playerImage");
+      this.frameX = 0;
+      this.frameY = 0;
+      this.speed = 0;
     }
     draw(context) {
       context.fillStyle = "white";
       context.fillRect(this.x, this.y, this.width, this.height);
+      context.drawImage(
+        this.image,
+        this.frameX * this.width,
+        this.frameY * this.height,
+        this.width,
+        this.height,
+        this.x,
+        this.y,
+        this.width,
+        this.height
+      );
+    }
+    update(input) {
+      // horizontal movement
+      this.x += this.speed;
+      if (input.keys.indexOf("ArrowRight") > -1) {
+        this.speed = 5;
+      } else if (input.keys.indexOf("ArrowLeft") > -1) {
+        this.speed = -5;
+      } else {
+        this.speed = 0;
+      }
     }
   }
 
@@ -65,7 +91,13 @@ window.addEventListener("DOMContentLoaded", function () {
 
   const input = new inputHandler();
   const player = new Player(canvas.width, canvas.height);
-  player.draw(ctx);
 
-  function animate() {}
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    player.draw(ctx);
+    player.update(input);
+    requestAnimationFrame(animate);
+  }
+
+  animate();
 });

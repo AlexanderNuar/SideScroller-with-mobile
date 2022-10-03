@@ -67,8 +67,8 @@ window.addEventListener("DOMContentLoaded", function () {
         this.speed = 5;
       } else if (input.keys.indexOf("ArrowLeft") > -1) {
         this.speed = -5;
-      } else if (input.keys.indexOf("ArrowUp") > -1) {
-        this.vy -= 10;
+      } else if (input.keys.indexOf("ArrowUp") > -1 && this.onGround()) {
+        this.vy -= 30;
       } else {
         this.speed = 0;
       }
@@ -82,7 +82,11 @@ window.addEventListener("DOMContentLoaded", function () {
       this.y += this.vy;
       if (!this.onGround()) {
         this.vy += this.weight;
+      } else {
+        this.vy = 0;
       }
+      if (this.y > this.gameHeight - this.height)
+        this.y = this.gameHeight - this.height;
     }
     onGround() {
       return this.y >= this.gameHeight - this.height;

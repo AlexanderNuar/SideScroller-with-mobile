@@ -6,6 +6,7 @@ window.addEventListener("DOMContentLoaded", function () {
   canvas.height = 720;
   let enemies = [];
   let score = 0;
+  let gameOver = false;
 
   class inputHandler {
     constructor() {
@@ -77,7 +78,16 @@ window.addEventListener("DOMContentLoaded", function () {
         this.height
       );
     }
-    update(input, deltaTime) {
+    update(input, deltaTime, enemies) {
+      // collision detection
+      enemies.forEach((enemy) => {
+        const dx = enemy.x - this.x;
+        const dy = enemy.y - this.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance < enemy.width / 2 + this.width / 2) {
+          gameOver = true;
+        }
+      });
       // sprite animation
       if (this.frameTimer > this.frameInterval) {
         if (this.frameX >= this.maxFrame) this.frameX = 0;
@@ -226,6 +236,14 @@ window.addEventListener("DOMContentLoaded", function () {
     context.fillText("Score: " + score, 20, 50);
     context.fillStyle = "white";
     context.fillText("Score: " + score, 22, 52);
+
+    if (gameOver) {
+      context.textAlign = "center";
+      context.fillStyle = "black";
+      context.fillText("Game Over, try again! ", canvas.width / 2, 200);
+      context.fillStyle = "white";
+      context.fillText("Game Over, try again! ", canvas.width / 2 + 5, 205);
+    }
   }
 
   const input = new inputHandler();
@@ -249,8 +267,10 @@ window.addEventListener("DOMContentLoaded", function () {
     handleEnemies(deltaTime);
     displayStatusText(ctx);
 
-    requestAnimationFrame(animate);
+    if (!gameOver) requestAnimationFrame(animate);
   }
 
   animate(0);
 });
+
+// 5 30

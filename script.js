@@ -20,6 +20,8 @@ window.addEventListener("DOMContentLoaded", function () {
           this.keys.indexOf(e.key) === -1
         ) {
           this.keys.push(e.key);
+        } else if (e.key === "Enter" && gameOver) {
+          restartGame();
         }
       });
       window.addEventListener("keyup", (e) => {
@@ -41,7 +43,7 @@ window.addEventListener("DOMContentLoaded", function () {
       this.gameHeight = gameHeight;
       this.width = 200;
       this.height = 200;
-      this.x = 0;
+      this.x = 100;
       this.y = this.gameHeight - this.height;
       this.image = document.getElementById("playerImage");
       this.frameX = 0;
@@ -54,18 +56,13 @@ window.addEventListener("DOMContentLoaded", function () {
       this.vy = 0;
       this.weight = 1;
     }
+    restart() {
+      this.x = 100;
+      this.y = this.gameHeight - this.height;
+      this.maxFrame = 8;
+      this.frameY = 0;
+    }
     draw(context) {
-      context.strokeStyle = "white";
-      context.strokeRect(this.x, this.y, this.width, this.height);
-      context.beginPath();
-      context.arc(
-        this.x + this.width / 2,
-        this.y + this.height / 2,
-        this.width / 2,
-        0,
-        Math.PI * 2
-      );
-      context.stroke();
       context.drawImage(
         this.image,
         this.frameX * this.width,
@@ -81,8 +78,8 @@ window.addEventListener("DOMContentLoaded", function () {
     update(input, deltaTime, enemies) {
       // collision detection
       enemies.forEach((enemy) => {
-        const dx = enemy.x - this.x;
-        const dy = enemy.y - this.y;
+        const dx = enemy.x + enemy.width / 2 - (this.x + this.width / 2);
+        const dy = enemy.y + enemy.height / 2 - (this.y + this.height / 2);
         const distance = Math.sqrt(dx * dx + dy * dy);
         if (distance < enemy.width / 2 + this.width / 2) {
           gameOver = true;
@@ -156,6 +153,9 @@ window.addEventListener("DOMContentLoaded", function () {
       this.x -= this.speed;
       if (this.x < 0 - this.width) this.x = 0;
     }
+    restart() {
+      this.x = 0;
+    }
   }
 
   class Enemy {
@@ -176,17 +176,6 @@ window.addEventListener("DOMContentLoaded", function () {
       this.markedForDelition = false;
     }
     draw(context) {
-      context.strokeStyle = "white";
-      context.strokeRect(this.x, this.y, this.width, this.height);
-      context.beginPath();
-      context.arc(
-        this.x + this.width / 2,
-        this.y + this.height / 2,
-        this.width / 2,
-        0,
-        Math.PI * 2
-      );
-      context.stroke();
       context.drawImage(
         this.image,
         this.frameX * this.width,
@@ -231,6 +220,7 @@ window.addEventListener("DOMContentLoaded", function () {
   }
 
   function displayStatusText(context) {
+    context.textAlign = "left";
     context.font = "40px Helvetica";
     context.fillStyle = "black";
     context.fillText("Score: " + score, 20, 50);
@@ -240,10 +230,27 @@ window.addEventListener("DOMContentLoaded", function () {
     if (gameOver) {
       context.textAlign = "center";
       context.fillStyle = "black";
-      context.fillText("Game Over, try again! ", canvas.width / 2, 200);
+      context.fillText(
+        "Game Over, press Enter to restart ",
+        canvas.width / 2,
+        200
+      );
       context.fillStyle = "white";
-      context.fillText("Game Over, try again! ", canvas.width / 2 + 5, 205);
+      context.fillText(
+        "Game Over, press Enter to restart ",
+        canvas.width / 2 + 5,
+        205
+      );
     }
+  }
+
+  function restartGame() {
+    player.restart();
+    background.restart();
+    enemies = [];
+    score = 0;
+    gameOver = false;
+    animate(0);
   }
 
   const input = new inputHandler();
@@ -273,4 +280,4 @@ window.addEventListener("DOMContentLoaded", function () {
   animate(0);
 });
 
-// 5 30
+// 5 36
